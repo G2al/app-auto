@@ -11,7 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Global security middleware applied to all web requests
+        $middleware->web(append: [
+            \App\Http\Middleware\BlockSuspiciousRequests::class,
+            \App\Http\Middleware\SecureFileUpload::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
