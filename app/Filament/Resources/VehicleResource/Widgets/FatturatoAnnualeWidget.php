@@ -17,15 +17,26 @@ class FatturatoAnnualeWidget extends AdvancedChartWidget
 
     // 🔹 Rimosse le righe del badge
 
-    public ?string $filter = '2025'; // Anno di default
+    public ?string $filter = null;
+
+    public function mount(): void
+    {
+        parent::mount();
+
+        $this->filter ??= (string) Carbon::now()->year;
+    }
 
     protected function getFilters(): ?array
     {
-        return [
-            '2023' => 'Anno 2023',
-            '2024' => 'Anno 2024',
-            '2025' => 'Anno 2025',
-        ];
+        $startYear = 2023;
+        $currentYear = Carbon::now()->year;
+
+        $filters = [];
+        for ($year = $startYear; $year <= $currentYear; $year++) {
+            $filters[(string) $year] = 'Anno ' . $year;
+        }
+
+        return $filters;
     }
 
     protected function getData(): array

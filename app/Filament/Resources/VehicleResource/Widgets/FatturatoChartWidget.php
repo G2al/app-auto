@@ -13,58 +13,50 @@ class FatturatoChartWidget extends AdvancedChartWidget
     protected static ?string $icon = 'heroicon-o-banknotes';
     protected static ?string $iconColor = 'success';
     protected static ?string $label = 'Andamento giornaliero';
+    protected static string $view = 'filament.widgets.fatturato-chart-widget';
 
-    public ?string $filter = 'ottobre'; // Mese di default
+    public ?string $yearFilter = null;
+    public ?string $monthFilter = null;
 
-    protected function getFilters(): ?array
+    public function mount(): void
     {
-        return [
-            'gennaio' => 'Gennaio 2025',
-            'febbraio' => 'Febbraio 2025',
-            'marzo' => 'Marzo 2025',
-            'aprile' => 'Aprile 2025',
-            'maggio' => 'Maggio 2025',
-            'giugno' => 'Giugno 2025',
-            'luglio' => 'Luglio 2025',
-            'agosto' => 'Agosto 2025',
-            'settembre' => 'Settembre 2025',
-            'ottobre' => 'Ottobre 2025',
-            'novembre' => 'Novembre 2025',
-            'dicembre' => 'Dicembre 2025',
-        ];
+        parent::mount();
+
+        $now = Carbon::now();
+        $this->yearFilter ??= (string) $now->year;
+        $this->monthFilter ??= (string) $now->month;
     }
 
     protected function getData(): array
     {
-        $monthMapping = [
-            'gennaio' => 1, 'febbraio' => 2, 'marzo' => 3, 'aprile' => 4,
-            'maggio' => 5, 'giugno' => 6, 'luglio' => 7, 'agosto' => 8,
-            'settembre' => 9, 'ottobre' => 10, 'novembre' => 11, 'dicembre' => 12
-        ];
+        $monthNames = $this->getMonthNames();
+        $selectedYear = (int) ($this->yearFilter ?? Carbon::now()->year);
+        $selectedMonth = (int) ($this->monthFilter ?? Carbon::now()->month);
 
-        $selectedMonth = $monthMapping[$this->filter] ?? Carbon::now()->month;
-        $year = 2025;
+        if (!isset($monthNames[$selectedMonth])) {
+            $selectedMonth = Carbon::now()->month;
+        }
 
-        $daysInMonth = Carbon::create($year, $selectedMonth, 1)->daysInMonth;
+        $daysInMonth = Carbon::create($selectedYear, $selectedMonth, 1)->daysInMonth;
         $days = [];
         $data = [];
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $days[] = $day;
             $fatturato = Vehicle::where('status', 'archiviato')
-                ->whereDate('updated_at', Carbon::create($year, $selectedMonth, $day))
+                ->whereDate('updated_at', Carbon::create($selectedYear, $selectedMonth, $day))
                 ->sum('sale_price');
             $data[] = round($fatturato / 1000, 1);
         }
 
-        // 🔹 Totale del mese (in euro)
+        // ðŸ”¹ Totale del mese (in euro)
         $fatturatoTotale = Vehicle::where('status', 'archiviato')
             ->whereMonth('updated_at', $selectedMonth)
-            ->whereYear('updated_at', $year)
+            ->whereYear('updated_at', $selectedYear)
             ->sum('sale_price');
 
-        // 🔹 Imposta la legenda con il totale accanto
-        $label = 'Fatturato (€k — €' . number_format($fatturatoTotale, 0, ',', '.') . ')';
+        // ðŸ”¹ Imposta la legenda con il totale accanto
+        $label = 'Fatturato (â‚¬k â€” â‚¬' . number_format($fatturatoTotale, 0, ',', '.') . ')';
 
         return [
             'datasets' => [
@@ -86,5 +78,46 @@ class FatturatoChartWidget extends AdvancedChartWidget
     protected function getType(): string
     {
         return 'line';
+    }
+
+    protected function getYearFilters(): array
+    {
+        $startYear = 2023;
+        $currentYear = Carbon::now()->year;
+
+        $filters = [];
+        for ($year = $startYear; $year <= $currentYear; $year++) {
+            $filters[(string) $year] = 'Anno ' . $year;
+        }
+
+        return $filters;
+    }
+
+    protected function getMonthFilters(): array
+    {
+        $filters = [];
+        foreach ($this->getMonthNames() as $monthNumber => $monthName) {
+            $filters[(string) $monthNumber] = $monthName;
+        }
+
+        return $filters;
+    }
+
+    protected function getMonthNames(): array
+    {
+        return [
+            1 => 'Gennaio',
+            2 => 'Febbraio',
+            3 => 'Marzo',
+            4 => 'Aprile',
+            5 => 'Maggio',
+            6 => 'Giugno',
+            7 => 'Luglio',
+            8 => 'Agosto',
+            9 => 'Settembre',
+            10 => 'Ottobre',
+            11 => 'Novembre',
+            12 => 'Dicembre',
+        ];
     }
 }
