@@ -659,14 +659,25 @@ Forms\Components\Section::make('Documenti')
                 $record->documents()->where('category', 'libretto')->delete();
                 
                 foreach ($state as $filePath) {
+                    $absolutePath = storage_path('app/public/' . $filePath);
+                    if (!is_file($absolutePath)) {
+                        \Log::warning('Documento mancante durante il salvataggio', [
+                            'resource' => 'SoldVehicleResource',
+                            'category' => 'libretto',
+                            'record_id' => $record?->id,
+                            'file_path' => $filePath,
+                        ]);
+                        continue;
+                    }
+
                     $record->documents()->create([
                         'category' => 'libretto',
                         'file_path' => $filePath,
                         'filename' => basename($filePath),
                         'original_name' => basename($filePath),
                         'file_type' => pathinfo($filePath, PATHINFO_EXTENSION),
-                        'mime_type' => mime_content_type(storage_path('app/public/' . $filePath)),
-                        'file_size' => filesize(storage_path('app/public/' . $filePath)),
+                        'mime_type' => mime_content_type($absolutePath),
+                        'file_size' => filesize($absolutePath),
                     ]);
                 }
             })
@@ -700,14 +711,25 @@ Forms\Components\Section::make('Documenti')
                 $record->documents()->where('category', 'riparazione')->delete();
                 
                 foreach ($state as $filePath) {
+                    $absolutePath = storage_path('app/public/' . $filePath);
+                    if (!is_file($absolutePath)) {
+                        \Log::warning('Documento mancante durante il salvataggio', [
+                            'resource' => 'SoldVehicleResource',
+                            'category' => 'riparazione',
+                            'record_id' => $record?->id,
+                            'file_path' => $filePath,
+                        ]);
+                        continue;
+                    }
+
                     $record->documents()->create([
                         'category' => 'riparazione',
                         'file_path' => $filePath,
                         'filename' => basename($filePath),
                         'original_name' => basename($filePath),
                         'file_type' => pathinfo($filePath, PATHINFO_EXTENSION),
-                        'mime_type' => mime_content_type(storage_path('app/public/' . $filePath)),
-                        'file_size' => filesize(storage_path('app/public/' . $filePath)),
+                        'mime_type' => mime_content_type($absolutePath),
+                        'file_size' => filesize($absolutePath),
                     ]);
                 }
             })
@@ -742,14 +764,25 @@ Forms\Components\Section::make('Documenti')
                 $record->documents()->where('category', 'atto_vendita')->delete();
                 
                 foreach ($state as $filePath) {
+                    $absolutePath = storage_path('app/public/' . $filePath);
+                    if (!is_file($absolutePath)) {
+                        \Log::warning('Documento mancante durante il salvataggio', [
+                            'resource' => 'SoldVehicleResource',
+                            'category' => 'atto_vendita',
+                            'record_id' => $record?->id,
+                            'file_path' => $filePath,
+                        ]);
+                        continue;
+                    }
+
                     $record->documents()->create([
                         'category' => 'atto_vendita',
                         'file_path' => $filePath,
                         'filename' => basename($filePath),
                         'original_name' => basename($filePath),
                         'file_type' => pathinfo($filePath, PATHINFO_EXTENSION),
-                        'mime_type' => mime_content_type(storage_path('app/public/' . $filePath)),
-                        'file_size' => filesize(storage_path('app/public/' . $filePath)),
+                        'mime_type' => mime_content_type($absolutePath),
+                        'file_size' => filesize($absolutePath),
                     ]);
                 }
             })
