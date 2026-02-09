@@ -56,7 +56,7 @@ class FatturatoChartWidget extends AdvancedChartWidget
             ->sum('sale_price');
 
         // ðŸ”¹ Imposta la legenda con il totale accanto
-        $label = 'Fatturato (â‚¬k â€” â‚¬' . number_format($fatturatoTotale, 0, ',', '.') . ')';
+        $label = 'Fatturato (€k - €' . number_format($fatturatoTotale, 0, ',', '.') . ')';
 
         return [
             'datasets' => [

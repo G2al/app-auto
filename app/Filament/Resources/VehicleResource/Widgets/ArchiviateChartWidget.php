@@ -79,7 +79,7 @@ class ArchiviateChartWidget extends AdvancedChartWidget
             ->selectRaw('SUM(COALESCE(sale_price,0) - COALESCE(total_cost,0)) as profit')
             ->value('profit') ?? 0;
 
-        $labelGuadagno = 'Guadagno (€k — €' . number_format($totGuadagno, 0, ',', '.') . ')';
+        $labelGuadagno = 'Guadagno (€k - €' . number_format($totGuadagno, 0, ',', '.') . ')';
         $labelArchiviati = 'Veicoli Archiviati (' . $totArchiviati . ')';
 
         return [

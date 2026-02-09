@@ -64,7 +64,7 @@ class FatturatoAnnualeWidget extends AdvancedChartWidget
             ->whereYear('updated_at', $year)
             ->sum('sale_price');
 
-        $label = 'Fatturato (€k — €' . number_format($totaleAnnuale, 0, ',', '.') . ')';
+        $label = 'Fatturato (€k - €' . number_format($totaleAnnuale, 0, ',', '.') . ')';
 
         return [
             'datasets' => [
