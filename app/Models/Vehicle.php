@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 class Vehicle extends Model
 {
@@ -66,9 +67,10 @@ class Vehicle extends Model
         static::saving(function ($vehicle) {
             $vehicle->total_cost = $vehicle->calculateTotalCost();
 
-            // Autocompila la data di archiviazione quando lo stato è "archiviato" e manca il valore
             if ($vehicle->status === 'archiviato' && empty($vehicle->archive_date)) {
-                $vehicle->archive_date = now();
+                throw ValidationException::withMessages([
+                    'archive_date' => 'La data di archiviazione è obbligatoria per i veicoli archiviati.',
+                ]);
             }
         });
     }

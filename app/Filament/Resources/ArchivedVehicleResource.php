@@ -764,6 +764,7 @@ Forms\Components\Section::make('Pagamento Misto')
                                 'venduto' => 'Venduto',
                                 'archiviato' => 'Archiviato',
                             ])
+                            ->live()
                             ->default('archiviato')
                             ->required(),
                         Forms\Components\TextInput::make('sale_price')
@@ -778,8 +779,9 @@ Forms\Components\Section::make('Pagamento Misto')
         Forms\Components\DatePicker::make('archive_date')
             ->label('Data Archiviazione')
             ->placeholder('Seleziona la data di archiviazione')
-            ->default(now())
-            ->visible(fn (callable $get) => $get('status') === 'archiviato'), // 👈 visibile solo se archiviato
+            ->required(fn (callable $get) => $get('status') === 'archiviato')
+            ->disabled(fn (callable $get) => $get('status') !== 'archiviato')
+            ->dehydrated(fn (callable $get) => $get('status') === 'archiviato'),
     ])
     ->columns(1),
 

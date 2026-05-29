@@ -23,7 +23,12 @@ class FatturatoChartWidget extends AdvancedChartWidget
         parent::mount();
 
         $now = Carbon::now();
-        $this->yearFilter ??= (string) $now->year;
+        $availableYears = array_keys($this->getYearFilters());
+
+        $this->yearFilter ??= in_array((string) $now->year, $availableYears, true)
+            ? (string) $now->year
+            : (string) (end($availableYears) ?: $now->year);
+
         $this->monthFilter ??= (string) $now->month;
     }
 
@@ -44,15 +49,15 @@ class FatturatoChartWidget extends AdvancedChartWidget
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $days[] = $day;
             $fatturato = Vehicle::where('status', 'archiviato')
-                ->whereDate('updated_at', Carbon::create($selectedYear, $selectedMonth, $day))
+                ->whereDate('archive_date', Carbon::create($selectedYear, $selectedMonth, $day))
                 ->sum('sale_price');
             $data[] = round($fatturato / 1000, 1);
         }
 
         // ðŸ”¹ Totale del mese (in euro)
         $fatturatoTotale = Vehicle::where('status', 'archiviato')
-            ->whereMonth('updated_at', $selectedMonth)
-            ->whereYear('updated_at', $selectedYear)
+            ->whereMonth('archive_date', $selectedMonth)
+            ->whereYear('archive_date', $selectedYear)
             ->sum('sale_price');
 
         // ðŸ”¹ Imposta la legenda con il totale accanto
@@ -82,15 +87,23 @@ class FatturatoChartWidget extends AdvancedChartWidget
 
     protected function getYearFilters(): array
     {
-        $startYear = 2023;
-        $currentYear = Carbon::now()->year;
+        $years = Vehicle::where('status', 'archiviato')
+            ->whereNotNull('archive_date')
+            ->selectRaw('YEAR(archive_date) as year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->filter()
+            ->values();
 
-        $filters = [];
-        for ($year = $startYear; $year <= $currentYear; $year++) {
-            $filters[(string) $year] = 'Anno ' . $year;
+        if ($years->isEmpty()) {
+            $years = collect([Carbon::now()->year]);
         }
 
-        return $filters;
+        return $years
+            ->mapWithKeys(fn (int $year) => [(string) $year => 'Anno ' . $year])
+            ->all();
     }
 
     protected function getMonthFilters(): array

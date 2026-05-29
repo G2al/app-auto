@@ -23,20 +23,33 @@ class FatturatoAnnualeWidget extends AdvancedChartWidget
     {
         parent::mount();
 
-        $this->filter ??= (string) Carbon::now()->year;
+        $now = Carbon::now();
+        $availableYears = array_keys($this->getFilters() ?? []);
+
+        $this->filter ??= in_array((string) $now->year, $availableYears, true)
+            ? (string) $now->year
+            : (string) (end($availableYears) ?: $now->year);
     }
 
     protected function getFilters(): ?array
     {
-        $startYear = 2023;
-        $currentYear = Carbon::now()->year;
+        $years = Vehicle::where('status', 'archiviato')
+            ->whereNotNull('archive_date')
+            ->selectRaw('YEAR(archive_date) as year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->filter()
+            ->values();
 
-        $filters = [];
-        for ($year = $startYear; $year <= $currentYear; $year++) {
-            $filters[(string) $year] = 'Anno ' . $year;
+        if ($years->isEmpty()) {
+            $years = collect([Carbon::now()->year]);
         }
 
-        return $filters;
+        return $years
+            ->mapWithKeys(fn (int $year) => [(string) $year => 'Anno ' . $year])
+            ->all();
     }
 
     protected function getData(): array
@@ -52,8 +65,8 @@ class FatturatoAnnualeWidget extends AdvancedChartWidget
             $months[] = $monthName;
 
             $fatturato = Vehicle::where('status', 'archiviato')
-                ->whereMonth('updated_at', $month)
-                ->whereYear('updated_at', $year)
+                ->whereMonth('archive_date', $month)
+                ->whereYear('archive_date', $year)
                 ->sum('sale_price');
 
             $data[] = round($fatturato / 1000, 1);
@@ -61,7 +74,7 @@ class FatturatoAnnualeWidget extends AdvancedChartWidget
 
         // Totale annuale in €
         $totaleAnnuale = Vehicle::where('status', 'archiviato')
-            ->whereYear('updated_at', $year)
+            ->whereYear('archive_date', $year)
             ->sum('sale_price');
 
         $label = 'Fatturato (€k - €' . number_format($totaleAnnuale, 0, ',', '.') . ')';
