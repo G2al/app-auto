@@ -60,6 +60,13 @@ Forms\Components\TextInput::make('license_plate')
                             ->numeric()
                             ->suffix(' km')
                             ->placeholder('0'),
+                        Forms\Components\DatePicker::make('last_revision_date')
+                            ->label('Ultima revisione'),
+                        Forms\Components\Textarea::make('additional_equipment')
+                            ->label('Dotazioni supplementari')
+                            ->maxLength(1000)
+                            ->rows(2)
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('color')
                             ->label('Colore')
                             ->required()
@@ -261,6 +268,23 @@ Forms\Components\TextInput::make('archive_number')
         Forms\Components\TextInput::make('customer_surname')
             ->label('Cognome Cliente')
             ->maxLength(255),
+        Forms\Components\TextInput::make('customer_fiscal_code')
+            ->label('Codice Fiscale')
+            ->maxLength(16),
+        Forms\Components\TextInput::make('customer_birth_place')
+            ->label('Nato/a a')
+            ->maxLength(255),
+        Forms\Components\DatePicker::make('customer_birth_date')
+            ->label('Data di nascita'),
+        Forms\Components\TextInput::make('customer_residence_city')
+            ->label('Residente in')
+            ->maxLength(255),
+        Forms\Components\TextInput::make('customer_address')
+            ->label('Via')
+            ->maxLength(255),
+        Forms\Components\TextInput::make('customer_street_number')
+            ->label('N. civico')
+            ->maxLength(20),
         Forms\Components\TextInput::make('phone_number')
             ->label('Numero di Telefono')
             ->tel()
@@ -268,6 +292,10 @@ Forms\Components\TextInput::make('archive_number')
             ->placeholder('+39 123 456 7890')
             ->rule('regex:/^[\+]?[0-9\s\-\(\)]+$/')
             ->helperText('Inserisci il numero di telefono del cliente'),
+        Forms\Components\TextInput::make('customer_email')
+            ->label('Email')
+            ->email()
+            ->maxLength(255),
         
         Forms\Components\Select::make('payment_method')
             ->label('Metodo di Pagamento')
@@ -858,6 +886,12 @@ Forms\Components\Section::make('Pagamento Misto')
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('contract')
+                    ->label('Contratto PDF')
+                    ->icon('heroicon-o-document-text')
+                    ->color('info')
+                    ->url(fn (Vehicle $record): string => route('vehicles.contract', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
