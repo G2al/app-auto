@@ -17,6 +17,15 @@ class EditVehicle extends EditRecord
         ];
     }
 
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction(),
+            \App\Filament\Actions\VehicleContractPdfAction::page(),
+            $this->getCancelFormAction(),
+        ];
+    }
+
     protected function mutateFormDataBeforeFill(array $data): array
     {
         // 🚀 OTTIMIZZATO - Una sola query invece di 3

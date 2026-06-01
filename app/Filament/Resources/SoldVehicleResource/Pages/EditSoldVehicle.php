@@ -17,4 +17,13 @@ class EditSoldVehicle extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction(),
+            \App\Filament\Actions\VehicleContractPdfAction::page(),
+            $this->getCancelFormAction(),
+        ];
+    }
 }

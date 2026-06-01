@@ -296,6 +296,10 @@ Forms\Components\TextInput::make('archive_number')
             ->label('Email')
             ->email()
             ->maxLength(255),
+        Forms\Components\Actions::make([
+            \App\Filament\Actions\VehicleContractPdfAction::form(),
+        ])
+            ->columnSpanFull(),
         
         Forms\Components\Select::make('payment_method')
             ->label('Metodo di Pagamento')

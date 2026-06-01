@@ -13,6 +13,18 @@
         return e($value);
     };
 
+    $titleField = function ($value, ?int $max = null) use ($field) {
+        $value = filled($value) ? trim((string) $value) : '';
+
+        if ($value !== '') {
+            $value = function_exists('mb_convert_case')
+                ? mb_convert_case(mb_strtolower($value), MB_CASE_TITLE, 'UTF-8')
+                : ucwords(strtolower($value));
+        }
+
+        return $field($value, $max);
+    };
+
     $date = fn ($value) => $value ? $value->format('d/m/Y') : '&nbsp;';
     $customerFullName = trim(($vehicle->customer_name ?? '') . ' ' . ($vehicle->customer_surname ?? ''));
 @endphp
@@ -233,8 +245,8 @@
 
             <p>
                 <span class="heading-label">ACQUIRENTE:</span>
-                <span class="line">Sig./Sig.ra <span class="field w126">{!! $field($customerFullName, 24) !!}</span>, nato/a a <span class="field w118">{!! $field($vehicle->customer_birth_place, 20) !!}</span> il <span class="field w78">{!! $date($vehicle->customer_birth_date) !!}</span>,</span><br>
-                <span class="line">C.F. <span class="field w138">{!! $field($vehicle->customer_fiscal_code, 22) !!}</span>, residente in <span class="field w104">{!! $field($vehicle->customer_residence_city, 18) !!}</span>, Via <span class="field w104">{!! $field($vehicle->customer_address, 20) !!}</span></span><br>
+                <span class="line">Sig./Sig.ra <span class="field w126">{!! $titleField($customerFullName, 24) !!}</span>, nato/a a <span class="field w118">{!! $titleField($vehicle->customer_birth_place, 20) !!}</span> il <span class="field w78">{!! $date($vehicle->customer_birth_date) !!}</span>,</span><br>
+                <span class="line">C.F. <span class="field w138">{!! $field($vehicle->customer_fiscal_code, 22) !!}</span>, residente in <span class="field w104">{!! $titleField($vehicle->customer_residence_city, 18) !!}</span>, Via <span class="field w104">{!! $titleField($vehicle->customer_address, 20) !!}</span></span><br>
                 <span class="line">n. <span class="field w24">{!! $field($vehicle->customer_street_number, 5) !!}</span>, Tel. <span class="field w112">{!! $field($vehicle->phone_number, 18) !!}</span>, email <span class="field w150">{!! $field($vehicle->customer_email, 28) !!}</span> (di seguito "Acquirente")</span>
             </p>
 
@@ -244,10 +256,10 @@
             </p>
 
             <p>
-                <span class="line">Marca: <span class="field w104">{!! $field($vehicle->brand_model, 18) !!}</span> Modello: <span class="field w126">{!! $field($vehicle->brand_model, 22) !!}</span> Targa: <span class="field w82">{!! $field($vehicle->license_plate, 12) !!}</span> Numero di Telaio</span><br>
+                <span class="line">Marca: <span class="field w104">{!! $titleField($vehicle->brand_model, 18) !!}</span> Modello: <span class="field w126">{!! $titleField($vehicle->brand_model, 22) !!}</span> Targa: <span class="field w82">{!! $field($vehicle->license_plate, 12) !!}</span> Numero di Telaio</span><br>
                 <span class="line">(VIN): <span class="field w138">{!! $field($vehicle->chassis, 24) !!}</span> Data di 1&ordf; Immatricolazione: <span class="field w88">{!! $field($vehicle->registration_year, 14) !!}</span></span><br>
-                <span class="line">Chilometraggio indicato: <span class="field w118">{!! $field($vehicle->km, 12) !!}</span> Km Colore: <span class="field w126">{!! $field($vehicle->color, 20) !!}</span></span><br>
-                <span class="line">Ultima revisione: <span class="field w112">{!! $date($vehicle->last_revision_date) !!}</span> Dotazioni supplementari: <span class="field w150">{!! $field($vehicle->additional_equipment, 28) !!}</span></span><br>
+                <span class="line">Chilometraggio indicato: <span class="field w118">{!! $field($vehicle->km, 12) !!}</span> Km Colore: <span class="field w126">{!! $titleField($vehicle->color, 20) !!}</span></span><br>
+                <span class="line">Ultima revisione: <span class="field w112">{!! $date($vehicle->last_revision_date) !!}</span> Dotazioni supplementari: <span class="field w150">{!! $titleField($vehicle->additional_equipment, 28) !!}</span></span><br>
                 <span class="line"><span class="field w138">&nbsp;</span> Documenti da consegnare: Libretto di circolazione, Certificato</span><br>
                 <span>di Propriet&agrave; Digitale (CDPD), libretto uso e manutenzione, n. 2 chiavi.</span>
             </p>
