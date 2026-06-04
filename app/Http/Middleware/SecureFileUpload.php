@@ -95,11 +95,15 @@ class SecureFileUpload
                     abort(403, 'File type not allowed.');
                 }
 
-                // Determina se il file è un media binario (es. immagini o chunk Livewire)
-                $isBinaryMedia = $mimeType && (str_starts_with($mimeType, 'image/') || $mimeType === 'application/octet-stream');
+                // Determina se il file è un media binario (es. immagini, PDF o chunk Livewire)
+                $isBinaryMedia = $mimeType && (
+                    str_starts_with($mimeType, 'image/')
+                    || $mimeType === 'application/octet-stream'
+                    || $mimeType === 'application/pdf'
+                );
 
                 // Layer 4: Scan file content for PHP code signatures
-                // Salta la scansione sui media binari per evitare falsi positivi su contenuti compressi (PNG/JPEG/HEIC)
+                // Salta la scansione sui media binari per evitare falsi positivi su contenuti compressi (PNG/JPEG/PDF)
                 if (!$isBinaryMedia && $file->getSize() < 5 * 1024 * 1024) { // Only scan files under 5MB
                     $content = file_get_contents($file->getRealPath());
                     if ($content !== false) {
