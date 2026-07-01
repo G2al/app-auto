@@ -22,7 +22,7 @@ class ListAvailableVehicles extends ListRecords
                 ->color('success')
                 ->action(function () {
                     $vehicles = \App\Models\Vehicle::where('status', 'disponibile')
-                        ->select('brand_model', 'license_plate', 'registration_year', 'color', 'fuel_type', 'sale_price')
+                        ->select('brand_model', 'license_plate', 'registration_year', 'km', 'color', 'fuel_type', 'sale_price')
                         ->orderBy('brand_model')
                         ->get();
                     
@@ -42,7 +42,7 @@ class ListAvailableVehicles extends ListRecords
                 ->color('info')
                 ->action(function () {
                     $vehicles = \App\Models\Vehicle::where('status', 'disponibile')
-                        ->select('brand_model', 'license_plate', 'registration_year', 'color', 'fuel_type', 'sale_price')
+                        ->select('brand_model', 'license_plate', 'registration_year', 'km', 'color', 'fuel_type', 'sale_price')
                         ->orderBy('brand_model')
                         ->get();
 
@@ -52,13 +52,14 @@ class ListAvailableVehicles extends ListRecords
 
                     $writer = new XLSXWriter();
                     $writer->openToFile($xlsxPath);
-                    $writer->addRow(Row::fromValues(['Marca / Modello', 'Targa', 'Anno', 'Colore', 'Alimentazione', 'Prezzo Vendita']));
+                    $writer->addRow(Row::fromValues(['Marca / Modello', 'Targa', 'Anno', 'Chilometri', 'Colore', 'Alimentazione', 'Prezzo Vendita']));
 
                     foreach ($vehicles as $vehicle) {
                         $writer->addRow(Row::fromValues([
                             $vehicle->brand_model,
                             $vehicle->license_plate,
                             $vehicle->registration_year,
+                            $vehicle->km,
                             $vehicle->color,
                             $vehicle->fuel_type,
                             $vehicle->sale_price ?? 0,

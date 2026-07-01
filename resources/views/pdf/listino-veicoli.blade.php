@@ -21,6 +21,7 @@
                 <th>Marca/Modello</th>
                 <th>Targa</th>
                 <th>Anno</th>
+                <th>Chilometri</th>
                 <th>Colore</th>
                 <th>Alimentazione</th>
                 <th>Prezzo</th>
@@ -32,6 +33,7 @@
                 <td>{{ $vehicle->brand_model }}</td>
                 <td>{{ $vehicle->license_plate }}</td>
                 <td>{{ $vehicle->registration_year }}</td>
+                <td>{{ $vehicle->km ? number_format($vehicle->km, 0, ',', '.') : '' }}</td>
                 <td>{{ $vehicle->color }}</td>
                 <td>{{ $vehicle->fuel_type }}</td>
                 <td>€ {{ number_format($vehicle->sale_price, 2, ',', '.') }}</td>
