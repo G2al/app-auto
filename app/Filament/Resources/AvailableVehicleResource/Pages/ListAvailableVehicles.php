@@ -27,7 +27,7 @@ class ListAvailableVehicles extends ListRecords
                         ->get();
                     
                     $pdf = \PDF::loadView('pdf.listino-veicoli', compact('vehicles'))
-                        ->setPaper('a4', 'portrait')
+                        ->setPaper('a4', 'landscape')
                         ->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
                     
                     return response()->streamDownload(function () use ($pdf) {
